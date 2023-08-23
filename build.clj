@@ -30,7 +30,7 @@
          :basis (b/create-basis {})
          :class-dir class-dir
          :target "target"
-         :src-dirs ["src/clojure"]))
+         :src-dirs ["src"]))
 
 (defn jar "Build the jar" [opts]
   (b/delete {:path "target"})
@@ -38,7 +38,7 @@
     (println "\nWriting pom.xml...")
     (b/write-pom opts)
     (println "\nCopying source...")
-    (b/copy-dir {:src-dirs ["resources" "src/clojure"] :target-dir class-dir})
+    (b/copy-dir {:src-dirs ["src"] :target-dir class-dir})
     (println "\nBuilding JAR...")
     (b/jar opts))
   opts)
