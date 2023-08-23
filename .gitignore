@@ -12,3 +12,8 @@ pom.xml.asc
 dev/
 flymd.md
 flymd.html
+/.cpcache
+/.clj-kondo
+!.clj-kondo/config.edn
+/.lsp
+!.lsp/config.edn
