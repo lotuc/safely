@@ -1,7 +1,8 @@
 (ns safely.core
   (:require [clojure.tools.logging :as log]
             [defun.core :refer [defun]]
-            [safely.circuit-breaker :refer [execute-with-circuit-breaker]]))
+            [safely.circuit-breaker :refer [execute-with-circuit-breaker]]
+            [com.brunobonacci.mulog :as u]))
 
 
 
@@ -102,10 +103,12 @@
 (defmacro mutrace
   "utility macro for tracing"
   {:no-doc true}
-  [status _event-name _config-map & body]
+  [status event-name config-map & body]
   `(if (= :disabled ~status)
      (do ~@body)
-     (do (log/debugf "mulog tracing unsupported") ~@body)))
+     (u/trace ~event-name
+       ~config-map
+       ~@body)))
 
 
 
@@ -293,9 +296,9 @@
 
 (defn- make-attempt-with-circuit-breaker
   [{:keys [message log-ns log-errors log-level log-stacktrace call-site] :as opts} f]
-  (let [;; transfer local-context to circuit-breaker thread
-        ;; ctx (u/local-context)
-        ;; f   (fn [] (u/with-context ctx (f)))
+  (let [ ;; transfer local-context to circuit-breaker thread
+        ctx (u/local-context)
+        f   (fn [] (u/with-context ctx (f)))
         ;; enquque call
         [value error :as result] (->> (execute-with-circuit-breaker f opts)
                                    (normalize-failure opts))]
